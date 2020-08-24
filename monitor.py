@@ -59,10 +59,10 @@ def on_minute(path):
     now = datetime.datetime.utcnow()
     with open(os.path.join(path, f"{now:%Y-%m-%d-%H}.csv"), "a") as f:
         f.writelines(f"{now:%Y-%m-%dT%H:%M:%S},{count}\n")
+    logger.info("Stored %s rotations per minute in local cache", count)
     semaphore.acquire()
     count = 0
     semaphore.release()
-    logger.info("Stored %s rotations per minute in local cache", count)
 
 
 def on_hour():
