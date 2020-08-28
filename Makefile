@@ -27,5 +27,8 @@ services: ## Install systemd services
 	sudo systemctl enable $(MONITOR)
 	sudo systemctl enable $(UPLOAD)
 
+tail-all: ## Tail all service logs
+	journalctl -f -u $(MONITOR) -u $(UPLOAD)
+
 venv: ## Create application virtual env
 	poetry install --no-dev
