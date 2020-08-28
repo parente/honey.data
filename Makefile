@@ -10,6 +10,14 @@ python3: ## Make python3 the default
 	sudo unlink /usr/bin/python
 	sudo link -s /usr/bin/python3 /usr/bin/python
 
+restart-monitor: ## Restart monitor service
+	sudo systemctl restart honey-data-monitor
+
+restart-upload: ## Restart upload service
+	sudo systemctl restart honey-data-upload
+
+restart-all: restart-monitor restart-upload ## Restart all services
+
 services: ## Install systemd services
 	sudo cp infrastructure/systemd/*.service /etc/systemd/system/
 	sudo systemctl start honey-data-monitor.service
