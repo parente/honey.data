@@ -9,25 +9,30 @@ resource "aws_iam_access_key" "honey_data" {
 
 data "aws_iam_policy_document" "honey_data" {
   statement {
-    sid     = "S3DataUpload"
-    actions = ["s3:PutObject"]
-    resources = [
-      "${aws_s3_bucket.honey_data.arn}/${local.incoming_rotations_path}/*",
-      "${aws_s3_bucket.honey_data_public.arn}/*",
+    sid = "AthenaS3Metadata"
+    actions = [
+      "s3:ListBucket",
+      "s3:GetBucketLocation",
+      "s3:ListAllMyBuckets"
     ]
+    resources = ["*"]
   }
 
-  # https://docs.amazonaws.cn/en_us/athena/latest/ug/federated-query-iam-access.html
   statement {
-    sid = "AthenaS3Results"
+    sid = "AthenaS3Access"
     actions = [
+      "s3:GetBucketLocation",
       "s3:GetObject",
-      "s3:PutObject",
+      "s3:ListBucket",
+      "s3:ListBucketMultipartUploads",
+      "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload",
-      "s3:ListMultipartUploadParts"
+      "s3:PutObject"
     ]
     resources = [
-      "${aws_s3_bucket.honey_data.arn}/${local.athena_results_path}/*",
+      "${aws_s3_bucket.honey_data.arn}/${local.incoming_rotations_path}*",
+      "${aws_s3_bucket.honey_data.arn}/${local.athena_results_path}*",
+      "${aws_s3_bucket.honey_data_public.arn}*",
     ]
   }
 
@@ -67,6 +72,16 @@ data "aws_iam_policy_document" "honey_data" {
     resources = [
       aws_athena_workgroup.honey_data.arn
     ]
+  }
+
+  statement {
+    sid = "AthenaGlueExecution"
+    actions = [
+      "glue:GetTable",
+      "glue:GetPartition",
+      "glue:GetPartitions",
+    ]
+    resources = ["*"]
   }
 }
 
