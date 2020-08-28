@@ -50,7 +50,7 @@ def on_save(path):
         return
 
     with open(os.path.join(path, f"{marker}.csv"), "a") as f:
-        f.writelines(f"{now:%Y-%m-%dT%H:%M:%S},{count}\n")
+        f.writelines(f"{now:%Y-%m-%d %H:%M:%S},{count}\n")
 
     logger.info("Stored %s rotations per minute in local cache", count)
     semaphore.acquire()
