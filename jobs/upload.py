@@ -8,6 +8,7 @@ vars, ~/.aws/credentials).
 """
 import argparse
 import datetime
+import glob
 import logging
 import os
 import time
@@ -29,8 +30,8 @@ def on_upload(path, bucket, prefix, s3_client):
 
     for filepath in glob.glob(os.path.join(path, "*.csv")):
         filename = os.path.basename(filepath)
-        datetime, _ = filename.split(os.path.extsep)
-        file_dt = datetime.datetime.fromisoformat(datetime)
+        str_dt, _ = filename.split(os.path.extsep)
+        file_dt = datetime.datetime.fromisoformat(str_dt)
         if file_dt < marker:
             key = f"{prefix}/year={file_dt:%Y}/month={file_dt:%m}/day={file_dt:%d}/{filename}"
             try:
