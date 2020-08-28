@@ -1,0 +1,15 @@
+[tool.poetry]
+name = "honey.data"
+version = "0.1.0"
+description = "Data collection and processing for the honey.fitness website"
+authors = ["Peter Parente <parente@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.7"
+boto3 = "^1.0"
+gpiozero = "^1.5"
+
+[tool.poetry.dev-dependencies]
+black = "^20.8b1"
+pytest = "^6.0"
