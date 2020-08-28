@@ -37,13 +37,18 @@ locals {
   incoming_rotations_path = "incoming-rotations"
 }
 
-output "bot_user" {
-  value       = aws_iam_user.honey_data
-  description = "Data bot IAM user"
+output "bot_user_arn" {
+  value       = aws_iam_user.honey_data.arn
+  description = "Data bot IAM user ARN"
 }
 
-output "access_key" {
-  value       = aws_iam_access_key.honey_data
-  description = "PGP-encrypted IAM key and secret for the data bot"
+output "access_key_id" {
+  value       = aws_iam_access_key.honey_data.id
+  description = "IAM key ID for the data bot"
+}
+
+output "secret_access_key" {
+  value       = aws_iam_access_key.honey_data.encrypted_secret
+  description = "PGP-encrypted IAM secret for the data bot"
   sensitive   = true
 }
