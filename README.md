@@ -5,19 +5,20 @@ Data collection and aggregation infrastructure for the honey.fitness website.
 ## Setup
 
 Create a Terraform Cloud workspace with `AWS_ACCESS_KEY_ID` and `AWS_SECRET_ACCESS_KEY` having admin
-permissions in an AWS account. Run the following on the development machine.
+permissions in an AWS account. Clone this repository on the development machine. The run the
+following.
 
 ```bash
-cd infrastructure
+cd honey.data/infrastructure
+# Provision AWS infrastructure
 terraform apply
-
-terraform output access_key_id
-terraform output secret_access_key | base64 --decode | keybase pgp decrypt
+# Retrieve AWS access key and secret. Adjust pbcopy if not on macOS
+terraform output access_key_id | pbcopy
+terraform output secret_access_key | base64 --decode | keybase pgp decrypt | pbcopy
 ```
 
-Now do all of the following on the Raspberry Pi device.
-
-Add the following profile to `~/.aws/credentials`.
+Switch to working on the Raspberry Pi device for the remaining steps. Add the following profile to
+`~/.aws/credentials`.
 
 ```ini
 [honey-data-bot]
@@ -26,24 +27,17 @@ aws_access_key_id=<access_key_id from terraform>
 aws_secret_access_key=<decrypted secret_access_key from terraform>
 ```
 
-Point `python` to Python 3.x if it is not already. Clone this repo. Then run the following.
+Clone this repository as `/home/pi/honey.data`. Then run the following.
 
 ```bash
-# Make python3 the default on older rpi devices
-sudo unlink /usr/bin/python
-sudo link -s /usr/bin/python3 /usr/bin/python
-
-# Install poetry one time
-curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poetry.py | python
-
-# Set up the application environment
 cd honey.data
-poetry install --no-dev
 
-# Set up systemd services
-sudo cp infrastructure/systemd/*.service /etc/systemd/system/
-sudo systemctl start honey-data-monitor.service
-sudo systemctl start honey-data-upload.service
-sudo systemctl enable honey-data-monitor.service
-sudo systemctl enable honey-data-upload.service
+# One time: Make python3 the default on older rpi devices
+make python3
+# One time: Install poetry
+make poetry
+# When deps change: Set up the application environment
+make venv
+# When service configs change: Set up systemd services
+make services
 ```
