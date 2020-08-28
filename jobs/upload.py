@@ -1,7 +1,10 @@
 #!/usr/bin/env python3
 """
-Counts the number of times a hall effect sensor detects a magnetic field
-every minute and writes those counts to a hourly CSVs on local disk.
+Uploads CSV files produced by jobs.monitor to an S3 bucket/prefix partitioned by year, month, and
+day for later processing.
+
+Assumes AWS credentials and region are configured in any standard, boto supported manner (e.g., env
+vars, ~/.aws/credentials).
 """
 import argparse
 import datetime
@@ -18,23 +21,24 @@ from . import common
 logger = logging.getLogger("honey.upload")
 
 
-def on_upload(path, bucket, s3_client):
+def on_upload(path, bucket, prefix, s3_client):
     marker = common.read_marker(path)
     if marker is None:
         logger.info("Skipping upload: no local cache marker")
         return
 
-    for filename in glob.glob(os.path.join(path, "*.csv")):
+    for filepath in glob.glob(os.path.join(path, "*.csv")):
+        filename = os.path.basename(filepath)
         datetime, _ = filename.split(os.path.extsep)
         file_dt = datetime.datetime.fromisoformat(datetime)
         if file_dt < marker:
-            key = f"year={file_dt:%Y}/month={file_dt:%m}/day={file_dt:%d}/{filename}"
+            key = f"{prefix}/year={file_dt:%Y}/month={file_dt:%m}/day={file_dt:%d}/{filename}"
             try:
-                response = s3_client.upload_file(filename, bucket, key)
+                response = s3_client.upload_file(filepath, bucket, key)
             except ClientError as e:
                 logger.error(e)
             else:
-                os.remove(filename)
+                os.remove(filepath)
                 logger.info("Migrated %s to s3://%s/%s", filename, bucket, key)
         else:
             logger.info("Skipped %s >= %s", filename, marker)
@@ -43,17 +47,20 @@ def on_upload(path, bucket, s3_client):
 def main():
     common.init_logging(logger)
 
-    parser = common.init_argparser("Data upload for honey.fitness")
-    parser.add_argument("--s3-bucket", default="honey-data", help="Remote S3 bucket")
+    parser = common.init_argparser("Data upload to S3 for honey.fitness")
+    parser.add_argument("--s3-bucket", default="honey-data", help="S3 bucket")
+    parser.add_argument(
+        "--s3-prefix", default="incoming-rotations", help="S3 key prefix"
+    )
     args = parser.parse_args()
 
-    s3_client = boto3.client("s3", region_name="us-east-1")
+    s3_client = boto3.client("s3")
     data_path = common.init_local_data_path(args.data_path)
     logger.info(f"Using %s for local data storage", data_path)
 
     logger.info("Starting uploader")
     while 1:
-        on_upload(data_path, args.s3_bucket, s3_client)
+        on_upload(data_path, args.s3_bucket, args.s3_prefix, s3_client)
         time.sleep(60 * 5)
     logger.info("Stopped uploader")
 
