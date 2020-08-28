@@ -43,10 +43,10 @@ def on_save(path):
     now = datetime.datetime.utcnow()
 
     marker = common.write_marker(path, now)
-    logger.info("Updated local cache marker to %s", marker)
+    logger.debug("Updated local cache marker to %s", marker)
 
     if count == 0:
-        logger.info("Skipping save: no rotations in the last minute")
+        logger.debug("Skipping save: no rotations in the last minute")
         return
 
     with open(os.path.join(path, f"{marker}.csv"), "a") as f:

@@ -25,9 +25,10 @@ logger = logging.getLogger("honey.upload")
 def on_upload(path, bucket, prefix, s3_client):
     marker = common.read_marker(path)
     if marker is None:
-        logger.info("Skipping upload: no local cache marker")
+        logger.warning("Skipping upload: no local cache marker")
         return
 
+    logger.info("Starting file upload job")
     for filepath in glob.glob(os.path.join(path, "*.csv")):
         filename = os.path.basename(filepath)
         str_dt, _ = filename.split(os.path.extsep)
@@ -43,6 +44,7 @@ def on_upload(path, bucket, prefix, s3_client):
                 logger.info("Migrated %s to s3://%s/%s", filename, bucket, key)
         else:
             logger.info("Skipped %s >= %s", filename, marker)
+    logger.info("Completed file upload job")
 
 
 def main():
