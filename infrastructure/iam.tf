@@ -2,6 +2,11 @@ resource "aws_iam_user" "honey_data" {
   name = "honey-data-bot"
 }
 
+resource "aws_iam_access_key" "honey_data" {
+  user    = aws_iam_user.honey_data.name
+  pgp_key = var.pgp_key
+}
+
 data "aws_iam_policy_document" "honey_data" {
   statement {
     sid     = "S3DataUpload"
