@@ -34,12 +34,15 @@ resource "aws_glue_catalog_table" "honey_data_incoming_rotations" {
       parameters = {
         "separatorChar" = ","
       }
+      name                  = "OpenCSVSerde"
       serialization_library = "org.apache.hadoop.hive.serde2.OpenCSVSerde"
     }
 
+    # Tired of trying to appease Athena TIMESTAMP format
+    # https://aws.amazon.com/premiumsupport/knowledge-center/query-table-athena-timestamp-empty/
     columns {
       name = "datetime"
-      type = "timestamp"
+      type = "string"
     }
 
     columns {
