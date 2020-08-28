@@ -52,4 +52,10 @@ def read_marker(path):
         return None
     with open(filename) as f:
         line = f.read()
-    return datetime.datetime.fromisoformat(line)
+    try:
+        # Even if we get a partial read because the file was being written, it's still acceptable
+        # because a partial ISO date will be even further in the past than the current datetime
+        return datetime.datetime.fromisoformat(line)
+    except ValueError:
+        # Invalid file format
+        return None
