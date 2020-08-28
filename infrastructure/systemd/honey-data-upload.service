@@ -1,0 +1,16 @@
+[Unit]
+Description=honey.data upload
+After=network.target
+
+[Service]
+ExecStart=/home/pi/honey.data/.venv/bin/python -m jobs.upload
+WorkingDirectory=/home/pi/honey.data
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=30
+User=pi
+Environment=AWS_PROFILE=honey-data-bot
+
+[Install]
+WantedBy=multi-user.target

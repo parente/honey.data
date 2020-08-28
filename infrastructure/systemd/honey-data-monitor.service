@@ -1,0 +1,15 @@
+[Unit]
+Description=honey.data monitor
+After=network.target
+
+[Service]
+ExecStart=/home/pi/honey.data/.venv/bin/python -m jobs.monitor
+WorkingDirectory=/home/pi/honey.data
+StandardOutput=inherit
+StandardError=inherit
+Restart=always
+RestartSec=30
+User=pi
+
+[Install]
+WantedBy=multi-user.target

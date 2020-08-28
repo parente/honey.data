@@ -39,4 +39,11 @@ curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-poet
 # Set up the application environment
 cd honey.data
 poetry install --no-dev
+
+# Set up systemd services
+sudo cp infrastructure/systemd/*.service /etc/systemd/system/
+sudo systemctl start honey-data-monitor.service
+sudo systemctl start honey-data-upload.service
+sudo systemctl enable honey-data-monitor.service
+sudo systemctl enable honey-data-upload.service
 ```
