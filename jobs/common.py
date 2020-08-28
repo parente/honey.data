@@ -5,17 +5,18 @@ import logging.handlers
 import os
 
 
-def init_logging():
+def init_logging(logger):
     """Configures logging to stdout and syslog."""
     logger.setLevel(logging.INFO)
-    syslog = logging.handlers.SysLogHandler(address="/dev/log")
-    syslog.setFormatter(logging.Formatter("%(name)s: %(message)s"))
     stream = logging.StreamHandler()
     stream.setFormatter(
         logging.Formatter("%(asctime)s: %(message)s", datefmt="%Y-%m-%dT%H:%M:%S")
     )
     logger.addHandler(stream)
-    logger.addHandler(syslog)
+    if os.path.exists("/dev/log"):
+        syslog = logging.handlers.SysLogHandler(address="/dev/log")
+        syslog.setFormatter(logging.Formatter("%(name)s: %(message)s"))
+        logger.addHandler(syslog)
 
 
 def init_local_data_path(data_path):

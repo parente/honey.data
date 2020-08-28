@@ -10,9 +10,6 @@ import os
 import signal
 import threading
 
-import boto3
-
-from botocore.exceptions import ClientError
 from gpiozero import LineSensor
 
 from . import common
@@ -62,7 +59,7 @@ def on_save(path):
 
 
 def main():
-    common.init_logging()
+    common.init_logging(logger)
 
     parser = common.init_argparser("Data collection for honey.fitness")
     parser.add_argument("--gpio-pin", default=4, help="Sensor pin number")

@@ -7,6 +7,7 @@ import argparse
 import datetime
 import logging
 import os
+import time
 
 import boto3
 
@@ -18,7 +19,7 @@ logger = logging.getLogger("honey.upload")
 
 
 def on_upload(path, bucket, s3_client):
-    marker = read_marker(path)
+    marker = common.read_marker(path)
     if marker is None:
         logger.info("Skipping upload: no local cache marker")
         return
@@ -40,7 +41,7 @@ def on_upload(path, bucket, s3_client):
 
 
 def main():
-    common.init_logging()
+    common.init_logging(logger)
 
     parser = common.init_argparser("Data upload for honey.fitness")
     parser.add_argument("--s3-bucket", default="honey-data", help="Remote S3 bucket")
@@ -48,13 +49,12 @@ def main():
 
     s3_client = boto3.client("s3", region_name="us-east-1")
     data_path = common.init_local_data_path(args.data_path)
-    logger.info(f"Using {data_path} for local data storage")
+    logger.info(f"Using %s for local data storage", data_path)
 
     logger.info("Starting uploader")
     while 1:
-        now = datetime.datetime.utcnow()
-        on_upload(data_path, args.bucket, s3_client)
-        time.sleep(60 * 60)
+        on_upload(data_path, args.s3_bucket, s3_client)
+        time.sleep(60 * 5)
     logger.info("Stopped uploader")
 
 
