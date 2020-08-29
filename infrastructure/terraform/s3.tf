@@ -1,6 +1,15 @@
 resource "aws_s3_bucket" "honey_data" {
   bucket = "honey-data"
   acl    = "private"
+
+  lifecycle_rule {
+    id = "AthenaResults"
+    enabled = true
+    prefix = "${local.athena_results_path}/"
+    expiration {
+      days = 30
+    }
+  }
 }
 
 resource "aws_s3_bucket_public_access_block" "honey_data_block" {
