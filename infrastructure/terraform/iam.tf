@@ -24,16 +24,18 @@ data "aws_iam_policy_document" "honey_data" {
       "s3:CopyObject",
       "s3:GetBucketLocation",
       "s3:GetObject",
+      "s3:GetObjectTagging",
       "s3:ListBucket",
       "s3:ListBucketMultipartUploads",
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload",
-      "s3:PutObject"
+      "s3:PutObject",
+      "s3:PutObjectTagging",
     ]
     resources = [
       "${aws_s3_bucket.honey_data.arn}/${local.incoming_rotations_path}*",
       "${aws_s3_bucket.honey_data.arn}/${local.athena_results_path}*",
-      "${aws_s3_bucket.honey_data_public.arn}*",
+      "${aws_s3_bucket.honey_data_public.arn}/*",
     ]
   }
 
