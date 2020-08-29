@@ -77,9 +77,19 @@ data "aws_iam_policy_document" "honey_data" {
   statement {
     sid = "AthenaGlueExecution"
     actions = [
+      "glue:GetDatabase",
+      "glue:GetDatabases",
+      "glue:CreateTable",
       "glue:GetTable",
+      "glue:GetTables",
+      "glue:BatchCreatePartition",
+      "glue:CreatePartition",
+      "glue:DeletePartition",
+      "glue:BatchDeletePartition",
+      "glue:UpdatePartition",
       "glue:GetPartition",
       "glue:GetPartitions",
+      "glue:BatchGetPartition"
     ]
     resources = ["*"]
   }
