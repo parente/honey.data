@@ -21,6 +21,7 @@ data "aws_iam_policy_document" "honey_data" {
   statement {
     sid = "AthenaS3Access"
     actions = [
+      "s3:CopyObject",
       "s3:GetBucketLocation",
       "s3:GetObject",
       "s3:ListBucket",
