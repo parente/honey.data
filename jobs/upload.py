@@ -66,7 +66,7 @@ def query(query, database, workgroup, athena_client, max_checks=30):
         if state == "SUCCEEDED":
             return qid
         elif state == "FAILED":
-            raise RuntimeError("Failed query execution: {query}")
+            raise RuntimeError(f"Failed query execution: {query}")
         # Continue to wait
         time.sleep(10)
     else:
@@ -86,6 +86,7 @@ def publish(
         CopySource=f"{results_bucket}/{results_prefix}/{results_id}.csv",
         Bucket=public_bucket,
         Key=public_key,
+        ACL="public-read",
     )
 
 

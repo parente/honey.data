@@ -30,6 +30,7 @@ data "aws_iam_policy_document" "honey_data" {
       "s3:ListMultipartUploadParts",
       "s3:AbortMultipartUpload",
       "s3:PutObject",
+      "s3:PutObjectAcl",
       "s3:PutObjectTagging",
     ]
     resources = [
