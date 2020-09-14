@@ -227,7 +227,7 @@ def main():
             s3_client,
             athena_client,
         )
-        time.sleep(60 * 10)
+        time.sleep(60 * 20)
     logger.info("Stopped uploader")
 
 
