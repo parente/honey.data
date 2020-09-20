@@ -30,6 +30,7 @@ def on_upload(path, bucket, prefix, s3_client):
         return
 
     logger.info("Starting file upload")
+    upload_count = 0
     for filepath in glob.glob(os.path.join(path, "*.csv")):
         filename = os.path.basename(filepath)
         str_dt, _ = filename.split(os.path.extsep)
@@ -41,11 +42,13 @@ def on_upload(path, bucket, prefix, s3_client):
             except ClientError as e:
                 logger.error(e)
             else:
+                upload_count += 1
                 os.remove(filepath)
                 logger.info("Migrated %s to s3://%s/%s", filename, bucket, key)
         else:
             logger.info("Skipped %s >= %s", filename, marker)
     logger.info("Completed file upload")
+    return upload_count
 
 
 def query(query, database, workgroup, athena_client, max_checks=30):
@@ -217,17 +220,18 @@ def main():
 
     logger.info("Starting uploader")
     while 1:
-        on_upload(data_path, args.s3_bucket, args.s3_incoming_prefix, s3_client)
-        on_aggregate(
-            args.s3_bucket,
-            args.s3_results_prefix,
-            args.s3_public_bucket,
-            args.athena_database,
-            args.athena_workgroup,
-            s3_client,
-            athena_client,
-        )
-        time.sleep(60 * 20)
+        if on_upload(data_path, args.s3_bucket, args.s3_incoming_prefix, s3_client) > 0:
+            # Aggregate only when we send new data, otherwise it's a no-op
+            on_aggregate(
+                args.s3_bucket,
+                args.s3_results_prefix,
+                args.s3_public_bucket,
+                args.athena_database,
+                args.athena_workgroup,
+                s3_client,
+                athena_client,
+            )
+        time.sleep(60 * 10)
     logger.info("Stopped uploader")
 
 
