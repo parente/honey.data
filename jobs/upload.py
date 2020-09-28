@@ -218,9 +218,15 @@ def main():
     data_path = common.init_local_data_path(args.data_path)
     logger.info(f"Using %s for local data storage", data_path)
 
+    # Always force aggregation on startup in case of prior error
+    startup = True
     logger.info("Starting uploader")
     while 1:
-        if on_upload(data_path, args.s3_bucket, args.s3_incoming_prefix, s3_client) > 0:
+        if (
+            startup
+            or on_upload(data_path, args.s3_bucket, args.s3_incoming_prefix, s3_client)
+            > 0
+        ):
             # Aggregate only when we send new data, otherwise it's a no-op
             on_aggregate(
                 args.s3_bucket,
@@ -231,6 +237,7 @@ def main():
                 s3_client,
                 athena_client,
             )
+            startup = False
         time.sleep(60 * 10)
     logger.info("Stopped uploader")
 
