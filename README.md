@@ -1,6 +1,7 @@
 # honey.data
 
-Data collection and aggregation infrastructure for the honey.fitness website.
+Data collection and aggregation infrastructure for the
+[honey.fitness](https://github.com/parente/honey.fitness) website.
 
 ## Setup
 
