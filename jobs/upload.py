@@ -33,8 +33,8 @@ def fix_nulls(filepath):
     """
     with safer.open(filepath, "rb") as fr:
         content = fr.read().replace(b"\x00", b"")
-        with safer.open(filepath, "w") as fw:
-            fw.write(content.encode("utf-8"))
+        with safer.open(filepath, "wb") as fw:
+            fw.write(content)
     return filepath
 
 

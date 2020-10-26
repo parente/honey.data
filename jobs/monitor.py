@@ -50,7 +50,11 @@ def on_save(path):
         logger.debug("Skipping save: no rotations in the last minute")
         return
 
-    with safer.open(os.path.join(path, f"{marker}.csv"), "a") as f:
+    with safer.open(
+        os.path.join(path, f"{marker}.csv"),
+        mode="a",
+        encoding="utf-8",
+    ) as f:
         f.writelines(f"{now:%Y-%m-%dT%H:%M:%SZ},{count}\n")
 
     logger.info("Stored %s rotations per minute in local cache", count)
