@@ -11,6 +11,7 @@ import signal
 import threading
 
 from gpiozero import LineSensor
+import safer
 
 from . import common
 
@@ -49,7 +50,7 @@ def on_save(path):
         logger.debug("Skipping save: no rotations in the last minute")
         return
 
-    with open(os.path.join(path, f"{marker}.csv"), "a") as f:
+    with safer.open(os.path.join(path, f"{marker}.csv"), "a") as f:
         f.writelines(f"{now:%Y-%m-%dT%H:%M:%SZ},{count}\n")
 
     logger.info("Stored %s rotations per minute in local cache", count)

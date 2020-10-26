@@ -11,15 +11,31 @@ import datetime
 import glob
 import logging
 import os
+import tempfile
 import time
 
 import boto3
+import safer
 
 from botocore.exceptions import ClientError
 
 from . import common
 
 logger = logging.getLogger("honey.upload")
+
+
+def fix_nulls(filepath):
+    """Removes null characters from the given file and overwrites it atomically.
+
+    When the device get unplugged mid-write to a CSV, null characters get introduced, corrupt
+    the CSV, and cause later Athena queries to fail. This function makes a basic attempt at turning
+    the CSV valid again.
+    """
+    with safer.open(filepath, "rb") as fr:
+        content = fr.read().replace(b"\x00", b"")
+        with safer.open(filepath, "w") as fw:
+            fw.write(content.encode("utf-8"))
+    return filepath
 
 
 def on_upload(path, bucket, prefix, s3_client):
@@ -36,6 +52,7 @@ def on_upload(path, bucket, prefix, s3_client):
         str_dt, _ = filename.split(os.path.extsep)
         file_dt = datetime.datetime.fromisoformat(str_dt)
         if file_dt < marker:
+            filepath = fix_nulls(filepath)
             key = f"{prefix}/year={file_dt:%Y}/month={file_dt:%m}/day={file_dt:%d}/{filename}"
             try:
                 response = s3_client.upload_file(filepath, bucket, key)
