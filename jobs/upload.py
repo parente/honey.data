@@ -239,11 +239,13 @@ def main():
     startup = True
     logger.info("Starting uploader")
     while 1:
-        if (
-            startup
-            or on_upload(data_path, args.s3_bucket, args.s3_incoming_prefix, s3_client)
-            > 0
-        ):
+        upload_count = on_upload(
+            data_path,
+            args.s3_bucket,
+            args.s3_incoming_prefix,
+            s3_client,
+        )
+        if (upload_count > 0) or startup:
             # Aggregate only when we send new data, otherwise it's a no-op
             on_aggregate(
                 args.s3_bucket,
