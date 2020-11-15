@@ -169,7 +169,7 @@ def on_aggregate(
 
     # Cumulative rotations per hour from this time 7 days ago til now
     results_id = query(
-        f"""
+        """
         select
             sum(rotations) as sum_rotations,
             to_iso8601(date_trunc('hour', from_iso8601_timestamp(datetime))) as datetime_hour,
@@ -197,6 +197,31 @@ def on_aggregate(
         s3_client,
     )
     logger.info("Computed hourly rotations for the past 7 days: %s", results_id)
+
+    # Rotations per day for the last year
+    results_id = query(
+        """
+        select
+            sum(rotations) as value,
+            date(date_trunc('day', from_iso8601_timestamp(datetime) - interval '16' hour)) + interval '1' day as day
+        from incoming_rotations
+        where year >= year(current_date)-1
+        group by date_trunc('day', from_iso8601_timestamp(datetime) - interval '16' hour)
+        order by day
+        """,
+        athena_database,
+        athena_workgroup,
+        athena_client,
+    )
+    publish(
+        results_bucket,
+        results_prefix,
+        results_id,
+        public_bucket,
+        "1-year-window.csv",
+        s3_client,
+    )
+    logger.info("Computed daily rotations for the past year: %s", results_id)
     logger.info("Completed data aggregation")
 
 
