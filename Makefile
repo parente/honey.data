@@ -13,7 +13,7 @@ poetry: ## Install poetry
 
 python3: ## Make python3 the default
 	sudo unlink /usr/bin/python
-	sudo link -s /usr/bin/python3 /usr/bin/python
+	sudo ln -s /usr/bin/python3 /usr/bin/python
 
 restart-monitor: ## Restart monitor service
 	sudo systemctl restart $(MONITOR)
