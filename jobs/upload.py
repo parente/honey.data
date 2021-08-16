@@ -43,7 +43,7 @@ def on_upload(path, bucket, prefix, s3_client):
     marker = common.read_marker(path)
     if marker is None:
         logger.warning("Skipping upload: no local cache marker")
-        return
+        return 0
 
     logger.info("Starting file upload")
     upload_count = 0
