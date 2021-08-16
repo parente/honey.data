@@ -14,8 +14,8 @@ cd honey.data/infrastructure
 # Provision AWS infrastructure
 terraform apply
 # Retrieve AWS access key and secret. Adjust pbcopy if not on macOS
-terraform output access_key_id | pbcopy
-terraform output secret_access_key | base64 --decode | keybase pgp decrypt | pbcopy
+terraform output access_key_id | tr -d '"' | pbcopy
+terraform output secret_access_key | tr -d '"' | base64 --decode | keybase pgp decrypt | pbcopy
 ```
 
 Switch to working on the Raspberry Pi device for the remaining steps. Add the following profile to
